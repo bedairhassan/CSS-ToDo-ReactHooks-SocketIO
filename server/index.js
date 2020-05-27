@@ -16,38 +16,62 @@ var server = app.listen(4000, function () {
 
 // Server Variables
 var users = [] // {socketid,whocansendmefr}
+var tasks = []
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
+ 
 
 // Socket setup & pass server
 var io = socket(server);
 io.on('connection', (socket) => {
 
     // base code
-    socket.emit(`helloWorld`,`hello world`)
-    socket.emit(`users`,users)
+    socket.emit(`users`, users)
     // base code, users.push
-    console.log(new Date(),`users.push`,{src:socket.id})
-    users.push({src:socket.id})
+    console.log(new Date(), `New Socket Has Connected`, { src: socket.id })
+    users.push({ src: socket.id })
     //
-    console.log(new Date(),`users`,users)
-    
-    // cheat sheet
-    // io.emit(event, data)
-    // socket.broadcast.to(target).emit(event, data)
-    
+    console.log(new Date(), `users`, users)
+
+
+
+
+    socket.on(`addtask`, name => {
+
+        const addedTask = { isChecked: false, id: makeid(10) ,src:socket.id,name}
+
+        tasks.push(addedTask)
+        console.log(new Date(), addedTask)
+        socket.emit(`loadMyTasks`, tasks.filter(task => task.src === socket.id))
+        console.log(tasks)
+    })
+
     socket.on(`disconnect`, () => {
 
         for (let i = 0; i < users.length; i++) {
 
             if (users[i].src === socket.id) {
-                
+
                 users.splice(i, 1)
                 break;
             }
         }
 
         socket.disconnect()
-        
+
         console.log(new Date(), `users`, users)
-        io.emit(`users`,users)
+        io.emit(`users`, users)
     })
 });
+
+// cheat sheet
+// io.emit(event, data)
+// socket.broadcast.to(target).emit(event, data)

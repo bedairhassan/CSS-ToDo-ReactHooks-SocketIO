@@ -1,37 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './ToDo.css';
 import Header from './Header'
 import Tasks from './Tasks'
 // import { AddTask } from './utils'
 
-function Parent() {
+function Parent({ socket }) {
 
     const [tasks, tasksSet] = useState([])
 
-    // group 1...
-    const generateRandom = () => Math.floor(Math.random() * 1500)
-    const obj = { isChecked: false, id: generateRandom() }
-    const newTask = (name) => {
-        return { ...obj, name }
+    useEffect(()=>{
+
+        socket.on(`loadMyTasks`,tasks=>tasksSet(tasks))
+
+    },[])
+
+    const AddTaskhere = (name) => {
+
+        // const addedTask = AddTask(tasks, name)
+        socket.emit(`addtask`, name)
+        // tasksSet(addedTask)
     }
 
-    const AddTask = (tasks, name) => [...tasks, newTask(name)]
-    //... group 1  //
-    const AddTaskhere = (name) => tasksSet(AddTask(tasks, name))
-
     const TriggerisChecked = (id) => {
-
-        // var copy = [...tasks]
-
-        // for (let i = 0; i < copy.length; i++) {
-
-        //     if (copy[i].id === id) {
-        //         console.table({ idOfCopy: copy[i].id, id: id })
-        //         const PREVisChecked = copy[i].isChecked
-        //         copy[i] = { ...copy[i], isChecked: !PREVisChecked }
-        //     }
-        // }
-        // tasksSet([...copy])
 
         var obj = tasks.filter(task => task.id === id)[0]
         const reducedTasks = tasks.filter(task => task.id !== id)
@@ -45,10 +35,13 @@ function Parent() {
             <Header AddTask={AddTaskhere} />
 
             <ul>
-                {tasks.length == 0 ? `No tasks have been added yet` : <Tasks tasks={tasks} TriggerisChecked={(id) => TriggerisChecked(id)} />}
+                {tasks.length === 0 ? `No tasks have been added yet` : <Tasks tasks={tasks} TriggerisChecked={(id) => TriggerisChecked(id)} />}
             </ul>
         </React.Fragment>
     )
 }
+
+// utils.js
+
 
 export default Parent
