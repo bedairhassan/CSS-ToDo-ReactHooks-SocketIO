@@ -1,11 +1,12 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Parent from './components/ToDo/Parent'
 
 function App() {
   return (
     <div>
-      <h1>hassan</h1>
+      
+      <Parent/>
 
     </div>
   );
