@@ -41,20 +41,22 @@ io.on('connection', (socket) => {
     //
     console.log(new Date(), `users`, users)
 
-    const TriggerisChecked = (tasks, id) => {
-
-        var obj = tasks.filter(task => task.id === id)[0]
-        const reducedTasks = tasks.filter(task => task.id !== id)
-        obj = { ...obj, isChecked: !obj.isChecked }
-        // tasksSet([...reducedTasks, obj])
-        return [...reducedTasks, obj]
-    }
-
-    socket.on(`TriggerisChecked`, id => {
+    socket.on(`TriggerisChecked`, id => { //idTASK!
 
         // warn: algocheck
-        const reducedTasks = TriggerisChecked(tasks,id)
-        tasks=[...reducedTasks] // since i already reduced one task only1
+        
+        // const reducedTasks = TriggerisChecked(tasks,id)
+        // tasks=[...reducedTasks] // since i already reduced one task only1
+
+        for (let i=0;i<tasks.length;i++){
+
+            if(tasks[i].src===socket.id){
+                if(id===tasks[i].id){
+                    tasks[i] = {...tasks[i],isChecked:!tasks[i].isChecked}
+                }
+            }
+        }
+
 
         socket.emit(`loadMyTasks`, tasks.filter(task => task.src === socket.id))
     })
