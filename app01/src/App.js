@@ -1,5 +1,6 @@
 import React,{useEffect} from 'react';
 import './App.css';
+// import Parent from './components/ToDo/Parent'
 import Parent from './components/ToDo/Parent'
 
 var socket = require('socket.io-client')('http://localhost:4000');

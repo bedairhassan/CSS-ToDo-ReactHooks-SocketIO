@@ -19,15 +19,15 @@ var users = [] // {socketid,whocansendmefr}
 var tasks = []
 
 function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
- }
- 
+}
+
 
 // Socket setup & pass server
 var io = socket(server);
@@ -41,12 +41,28 @@ io.on('connection', (socket) => {
     //
     console.log(new Date(), `users`, users)
 
+    const TriggerisChecked = (tasks, id) => {
 
+        var obj = tasks.filter(task => task.id === id)[0]
+        const reducedTasks = tasks.filter(task => task.id !== id)
+        obj = { ...obj, isChecked: !obj.isChecked }
+        // tasksSet([...reducedTasks, obj])
+        return [...reducedTasks, obj]
+    }
+
+    socket.on(`TriggerisChecked`, id => {
+
+        // warn: algocheck
+        const reducedTasks = TriggerisChecked(tasks,id)
+        tasks=[...reducedTasks] // since i already reduced one task only1
+
+        socket.emit(`loadMyTasks`, tasks.filter(task => task.src === socket.id))
+    })
 
 
     socket.on(`addtask`, name => {
 
-        const addedTask = { isChecked: false, id: makeid(10) ,src:socket.id,name}
+        const addedTask = { isChecked: false, id: makeid(10), src: socket.id, name }
 
         tasks.push(addedTask)
         console.log(new Date(), addedTask)
